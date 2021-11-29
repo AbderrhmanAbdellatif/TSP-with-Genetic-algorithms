@@ -49,6 +49,7 @@ class VisualSolve:
         self.local_temp = []
         self.best_tour = []
         self.master = master
+        self.newPopulationlist=[]
         self.newtsp = []
         self.init_plot(master)
         self.frame = Frame(master)
@@ -80,17 +81,18 @@ class VisualSolve:
 
         i = 0
         while i != 20000:
+            poplist= self.newPopulationlist;
             print("Termination now is ", i)
-            if i == 1000 or i == 2000 or i == 5000 or i == 10000 or i == 19000:
+            if i == 10 or i == 2000 or i == 5000 or i == 10000 or i == 19000:
                 print("Termination now is ", i)
                 self.CrossoverAndMutation(poplist)
-                button1 = Button(self.frame, text="TerminationCondition now is " + str(i), pady=3)
-                button1.grid(row=4, column=0, columnspan=2, sticky=(E, W, N, S))
+                input("Press Enter to continue...")
             self.CrossoverAndMutation(poplist)
             i = i + 1
 
     def find_the_shortest_path(self, new_pop):
         self.temp = sorted(self.give_distances_list(new_pop), key=lambda x: x[0])
+        print('shortest_path_distance_cost ',self.temp)
         shortest_path = []
         shortest_path_distance_cost = min(i[0] for i in self.temp)  # take the min in list the sum
         # print('shortest_path_distance_cost ',shortest_path_distance_cost)
@@ -106,6 +108,7 @@ class VisualSolve:
         self.update_visual_current_distance(shortest_path_distance_cost)
         self.plot_tour(shortest_path_tuples)
         if self.TerminationCondition == 0:
+            self.newPopulationlist =new_pop
             button1 = Button(self.frame, text="Create children", pady=3,command=lambda: self.CrossoverAndMutation(new_pop))
             button1.grid(row=4, column=0, columnspan=2, sticky=(E, W, N, S))
         if self.TerminationCondition == 1:
@@ -115,33 +118,24 @@ class VisualSolve:
         tspGeneticAlgo = TSPGeneticAlgo()
         distance_list = sorted(self.give_distances_list(new_pop), key=lambda x: x[0], reverse=True)
         # print('distance cost')
-        # print(distance_list[0])  # take the wors index
-        # print(distance_list[1])  # and seconde worst index
-        # print('distance list')
-        # print(distance_list[0][1])# take the wors index
-        # print(distance_list[1][1])# and seconde worst index
+        print(distance_list)  # take the wors index
         children = tspGeneticAlgo.crossover(distance_list[0][1],
                                             distance_list[1][1])  # make crossover and get childerin
         children_list = []
         for index in range(len(distance_list)):
             children_list.append(distance_list[index][1])
 
-        # replace two childern with Parent
-        # print('childern list')
         children_list[0] = children[0].copy()
         children_list[1] = children[1].copy()
-
-        # print(children_list[0])# take the wors index
-        # print(children_list[1])# and seconde worst index
-        # print('calculte the cost after crossover')
-        # calculte the cost after crossover
         children_list_costs = self.give_distances_list(children_list)
         crossver_Chlidern_list = []  # take the list from tuples
         for pop_children_list in children_list_costs:
             crossver_Chlidern_list.append(pop_children_list[1])
         new_pop_list = tspGeneticAlgo.create_mutation(crossver_Chlidern_list)
         self.TerminationCondition=self.TerminationCondition+1
-        self.find_the_shortest_path(new_pop_list)
+        self.newPopulationlist=new_pop_list
+        print('shortest_path ', self.newPopulationlist)
+        self.find_the_shortest_path(self.newPopulationlist)
 
     def update_visual_current_distance(self, distance):
         """
@@ -162,6 +156,9 @@ class VisualSolve:
         print('population size ', self.initial_population_size)
         new_pop = TSPInitialPopulation(init_dict, init_tour,
                                        self.initial_population_size)  # plus the population initial size (here is 200)
+        for i in new_pop.pop_group:
+            print(i)
+
         return new_pop.pop_group  # retrun  the soltion steps random  array equal 100
 
     def openfile(self, frame1=None):
