@@ -5,32 +5,25 @@ Created on Sat Nov 13 21:37:50 2021
 @author: aellatif
 """
 
-
-## from Tkinter import *
 from time import sleep
 from tkinter import filedialog
-## import ttk
 import threading
 from tkinter import *
 from tkinter import ttk
-
-
 import threading
-
 import matplotlib
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-from Tsp_Read_File import *
-from TspDistance import *
-from Init_poplist import *
-from TspGen import *
+import numpy as np
+from Init_poplist import TSPInitialPopulation
+from TspDistance import TSPDistance
+from TspGen import TSPGeneticAlgo
+from Tsp_Read_File import TSPParser
 matplotlib.use('TkAgg')
 root = Tk()
 root.title("TSP Solver")# title of frame
 root.geometry("1004x768")# cozumluk sekili
-
 text_cx = Label(root, bg='black', fg="white", width=1, font=('times', 12, 'bold'))
 text_cx.grid(row=6, column=1, sticky=(W, N, S, E))
 text_cy = Label(root, bg='black', fg="white", font=('times', 12, 'bold'))
@@ -43,7 +36,6 @@ def on_move(event):
         ax = event.inaxes  # the axes instance
         text_cx.config(text='data coords X %f' % (round(event.xdata, 1)))
         text_cy.config(text='data coords Y %f' % (round(event.ydata, 1)))
-
 class VisualSolve:
     def __init__(self,master):
         self.city_coords=self.read_file().city_coords
@@ -91,6 +83,10 @@ class VisualSolve:
         self.plot_tour(shortest_path_tuples)
         button1 = Button(self.frame, text="Create children", pady=3, command=lambda: self.crossover(new_pop))
         button1.grid(row=4, column=0, columnspan=2, sticky=(E, W, N, S))
+    def mutation(self,new_pop):
+        tspGeneticAlgo=TSPGeneticAlgo()
+        tspGeneticAlgo.insertion_mutation(self.crossover(new_pop))
+
     def crossover(self,new_pop):#make crossover
         tspGeneticAlgo=TSPGeneticAlgo()
         distance_list=sorted(self.give_distances_list(new_pop), key=lambda x: x[0],reverse=True)
@@ -115,8 +111,7 @@ class VisualSolve:
         print('calculte the cost after crossover')
         #calculte the cost after crossover
         children_list_costs=self.give_distances_list(children_list)
-        for children_list in children_list_costs:
-            print(children_list)
+        return children_list_costs # poplist
 
     def update_visual_current_distance(self, distance):
         """
