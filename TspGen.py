@@ -29,9 +29,9 @@ class TSPGeneticAlgo:
         mutation_operator_size = random.choice(mutation_operator_list)  # for 0.1 0.2 0.3 0.3 ......
         mutsize = int(poplistsize * mutation_operator_size) # 101 * 0.1 = 10
         for i in range(mutsize):  # randomly chosee mut
-            index = random.randint(0, len(poplist_size) - 1)
+            index = random.randint(0, len(poplist) - 1)
             poplist[index] = self.insertion_mutation(poplist[index]).copy()
-
+        return poplist
     def insertion_mutation(self,in_list):
         tour_range = len(in_list)
         randominsert = random.randint(0, tour_range - 1)
